@@ -81,6 +81,7 @@ import timber.log.Timber
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import uy.kohesive.injekt.injectLazy
+import java.util.ArrayDeque
 import kotlin.math.min
 
 class MangaController :
@@ -152,7 +153,7 @@ class MangaController :
 
     private val isLocalSource by lazy { presenter.source.id == LocalSource.ID }
 
-    private var lastClickPosition = -1
+    private var lastClickPositionStack = ArrayDeque(listOf(-1))
 
     private var isRefreshingInfo = false
     private var isRefreshingChapters = false
@@ -725,7 +726,12 @@ class MangaController :
         val adapter = chaptersAdapter ?: return false
         val item = adapter.getItem(position) ?: return false
         return if (actionMode != null && adapter.mode == SelectableAdapter.Mode.MULTI) {
-            lastClickPosition = position
+            if (adapter.isSelected(position)) {
+                lastClickPositionStack.removeFirstOccurrence(position)
+            } else {
+                lastClickPositionStack.push(position)
+            }
+
             toggleSelection(position)
             true
         } else {
@@ -736,6 +742,7 @@ class MangaController :
 
     override fun onItemLongClick(position: Int) {
         createActionModeIfNeeded()
+        val lastClickPosition = lastClickPositionStack.peek()!!
         when {
             lastClickPosition == -1 -> setSelection(position)
             lastClickPosition > position ->
@@ -746,7 +753,9 @@ class MangaController :
                     setSelection(i)
             else -> setSelection(position)
         }
-        lastClickPosition = position
+        if (lastClickPosition != position) {
+            lastClickPositionStack.push(position)
+        }
         chaptersAdapter?.notifyDataSetChanged()
     }
 
@@ -795,7 +804,8 @@ class MangaController :
     }
 
     private fun destroyActionModeIfNeeded() {
-        lastClickPosition = -1
+        lastClickPositionStack.clear()
+        lastClickPositionStack.push(-1)
         actionMode?.finish()
     }
 
