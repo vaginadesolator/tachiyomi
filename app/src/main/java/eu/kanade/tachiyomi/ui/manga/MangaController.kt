@@ -727,7 +727,7 @@ class MangaController :
         val item = adapter.getItem(position) ?: return false
         return if (actionMode != null && adapter.mode == SelectableAdapter.Mode.MULTI) {
             if (adapter.isSelected(position)) {
-                lastClickPositionStack.removeFirstOccurrence(position)
+                lastClickPositionStack.remove(position) // possible that it's not there, but no harm
             } else {
                 lastClickPositionStack.push(position)
             }
@@ -754,6 +754,7 @@ class MangaController :
             else -> setSelection(position)
         }
         if (lastClickPosition != position) {
+            lastClickPositionStack.remove(position) // move to top if already exists
             lastClickPositionStack.push(position)
         }
         chaptersAdapter?.notifyDataSetChanged()
