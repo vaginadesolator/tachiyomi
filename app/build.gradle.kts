@@ -125,7 +125,7 @@ android {
 dependencies {
 
     // Source models and interfaces from Tachiyomi 1.x
-    implementation("tachiyomi.sourceapi:source-api:1.1")
+    implementation("tachiyomi.sourceapi:source-api:1.1-SNAPSHOT")
 
     // AndroidX libraries
     implementation("androidx.annotation:annotation:1.2.0-alpha01")
@@ -314,6 +314,7 @@ buildscript {
 repositories {
     mavenCentral()
     jcenter()
+    mavenLocal()
 }
 
 

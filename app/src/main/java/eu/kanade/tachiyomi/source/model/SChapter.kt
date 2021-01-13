@@ -15,12 +15,15 @@ interface SChapter : Serializable {
 
     var scanlator: String?
 
+    var page_count: Int
+
     fun copyFrom(other: SChapter) {
         name = other.name
         url = other.url
         date_upload = other.date_upload
         chapter_number = other.chapter_number
         scanlator = other.scanlator
+        page_count = other.page_count
     }
 
     companion object {
@@ -36,7 +39,8 @@ fun SChapter.toChapterInfo(): ChapterInfo {
         key = this.url,
         name = this.name,
         number = this.chapter_number,
-        scanlator = this.scanlator ?: ""
+        scanlator = this.scanlator ?: "",
+        pageCount = this.page_count
     )
 }
 
@@ -48,5 +52,6 @@ fun ChapterInfo.toSChapter(): SChapter {
         date_upload = chapter.dateUpload
         chapter_number = chapter.number
         scanlator = chapter.scanlator
+        page_count = chapter.pageCount
     }
 }
