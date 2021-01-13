@@ -7,6 +7,7 @@ import com.jakewharton.rxrelay.BehaviorRelay
 import com.jakewharton.rxrelay.PublishRelay
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.cache.ChapterCache
+import eu.kanade.tachiyomi.data.database.DatabaseHelper
 import eu.kanade.tachiyomi.data.database.models.Chapter
 import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.data.download.model.Download
@@ -54,6 +55,7 @@ class Downloader(
 ) {
 
     private val chapterCache: ChapterCache by injectLazy()
+    private val db: DatabaseHelper by injectLazy()
 
     /**
      * Store for persisting downloads across restarts.
@@ -261,6 +263,14 @@ class Downloader(
         }
     }
 
+    private fun setChapterPageCount(chapter: Chapter, pageCount: Int) {
+        if (chapter.page_count > 0 && chapter.page_count == pageCount) {
+            return
+        }
+        chapter.page_count = pageCount
+        db.updateChapterPageCount(chapter).executeAsBlocking()
+    }
+
     /**
      * Returns the observable which downloads a chapter.
      *
@@ -287,6 +297,7 @@ class Downloader(
                         throw Exception(context.getString(R.string.page_list_empty_error))
                     }
                     download.pages = pages
+                    setChapterPageCount(download.chapter, pages.size)
                 }
         } else {
             // Or if the page list already exists, start from the file
