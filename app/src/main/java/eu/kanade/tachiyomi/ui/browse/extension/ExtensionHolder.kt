@@ -8,6 +8,7 @@ import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.databinding.ExtensionCardItemBinding
 import eu.kanade.tachiyomi.extension.model.Extension
 import eu.kanade.tachiyomi.extension.model.InstallStep
+import eu.kanade.tachiyomi.extension.util.ExtensionLoader
 import eu.kanade.tachiyomi.util.system.LocaleHelper
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
@@ -31,12 +32,13 @@ class ExtensionHolder(view: View, val adapter: ExtensionAdapter) :
         val extension = item.extension
 
         binding.extTitle.text = extension.name
+        binding.vendor.text = extension.vendor
         binding.version.text = extension.versionName
         binding.lang.text = LocaleHelper.getSourceDisplayName(extension.lang, itemView.context)
         binding.warning.text = when {
             extension is Extension.Untrusted -> itemView.context.getString(R.string.ext_untrusted)
             extension is Extension.Installed && extension.isObsolete -> itemView.context.getString(R.string.ext_obsolete)
-            extension is Extension.Installed && extension.isUnofficial -> itemView.context.getString(R.string.ext_unofficial)
+            extension is Extension.Installed && extension.isUnofficial && extension.vendor == ExtensionLoader.UNOFFICIAL_VENDOR -> itemView.context.getString(R.string.ext_unofficial)
             extension.isNsfw && shouldLabelNsfw -> itemView.context.getString(R.string.ext_nsfw_short)
             else -> ""
         }.toUpperCase()

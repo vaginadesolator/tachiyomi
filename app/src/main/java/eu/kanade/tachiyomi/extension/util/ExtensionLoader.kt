@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import dalvik.system.PathClassLoader
 import eu.kanade.tachiyomi.annotations.Nsfw
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
+import eu.kanade.tachiyomi.extension.api.ExtensionGithubApi
 import eu.kanade.tachiyomi.extension.model.Extension
 import eu.kanade.tachiyomi.extension.model.LoadResult
 import eu.kanade.tachiyomi.source.CatalogueSource
@@ -32,6 +33,7 @@ internal object ExtensionLoader {
     private const val EXTENSION_FEATURE = "tachiyomi.extension"
     private const val METADATA_SOURCE_CLASS = "tachiyomi.extension.class"
     private const val METADATA_NSFW = "tachiyomi.extension.nsfw"
+    private const val METADATA_VENDOR = "tachiyomi.extension.vendor"
     const val LIB_VERSION_MIN = 1.2
     const val LIB_VERSION_MAX = 1.3
 
@@ -39,6 +41,8 @@ internal object ExtensionLoader {
 
     // inorichi's key
     private const val officialSignature = "7ce04da7773d41b489f4693a366c36bcd0a11fc39b547168553c285bd7348e23"
+
+    const val UNOFFICIAL_VENDOR = "unknown"
 
     /**
      * List of the trusted signatures.
@@ -100,7 +104,11 @@ internal object ExtensionLoader {
             return LoadResult.Error(error)
         }
 
-        val extName = pkgManager.getApplicationLabel(appInfo).toString().substringAfter("Tachiyomi: ")
+        val extName = Extension.buildExtName(pkgManager.getApplicationLabel(appInfo).toString())
+        val signatureHash = getSignatureHash(pkgInfo) ?: return LoadResult.Error("Package $pkgName isn't signed")
+        val isOfficial = signatureHash == officialSignature
+        val vendor = appInfo.metaData.getString(METADATA_VENDOR, if (isOfficial) ExtensionGithubApi.DEFAULT_GITHUB_USER else UNOFFICIAL_VENDOR)
+
         val versionName = pkgInfo.versionName
         val versionCode = pkgInfo.versionCode
 
@@ -119,16 +127,6 @@ internal object ExtensionLoader {
             )
             Timber.w(exception)
             return LoadResult.Error(exception)
-        }
-
-        val signatureHash = getSignatureHash(pkgInfo)
-
-        if (signatureHash == null) {
-            return LoadResult.Error("Package $pkgName isn't signed")
-        } else if (signatureHash !in trustedSignatures) {
-            val extension = Extension.Untrusted(extName, pkgName, versionName, versionCode, signatureHash)
-            Timber.w("Extension $pkgName isn't trusted")
-            return LoadResult.Untrusted(extension)
         }
 
         val isNsfw = appInfo.metaData.getInt(METADATA_NSFW) == 1
@@ -168,13 +166,18 @@ internal object ExtensionLoader {
             }
             .filter { !isSourceNsfw(it) }
 
-        val langs = sources.filterIsInstance<CatalogueSource>()
-            .map { it.lang }
-            .toSet()
-        val lang = when (langs.size) {
-            0 -> ""
-            1 -> langs.first()
-            else -> "all"
+        val lang = sources.filterIsInstance<CatalogueSource>().map { it.lang }.toSet().let {
+            when (it.size) {
+                0 -> ""
+                1 -> it.first()
+                else -> "all"
+            }
+        }
+
+        if (signatureHash !in trustedSignatures) {
+            val extension = Extension.Untrusted(extName, pkgName, versionName, versionCode, signatureHash, lang, isNsfw, vendor)
+            Timber.w("Extension $pkgName isn't trusted")
+            return LoadResult.Untrusted(extension)
         }
 
         val extension = Extension.Installed(
@@ -184,8 +187,9 @@ internal object ExtensionLoader {
             versionCode,
             lang,
             isNsfw,
+            vendor,
             sources,
-            isUnofficial = signatureHash != officialSignature
+            isUnofficial = !isOfficial
         )
         return LoadResult.Success(extension)
     }

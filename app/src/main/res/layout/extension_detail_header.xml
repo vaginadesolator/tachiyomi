@@ -70,6 +70,18 @@
             tools:text="Language: English" />
 
         <TextView
+            android:id="@+id/extension_vendor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:elevation="3dp"
+            android:gravity="center"
+            app:layout_constraintStart_toStartOf="@id/extension_title"
+            app:layout_constraintTop_toBottomOf="@id/extension_lang"
+            tools:text="Vendor: tachiyomi" />
+
+        <TextView
             android:id="@+id/extension_nsfw"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -81,7 +93,7 @@
             android:textColor="?attr/colorError"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="@id/extension_title"
-            app:layout_constraintTop_toBottomOf="@id/extension_lang"
+            app:layout_constraintTop_toBottomOf="@id/extension_vendor"
             tools:visibility="visible" />
 
         <TextView

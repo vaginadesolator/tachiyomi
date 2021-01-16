@@ -158,7 +158,7 @@ class ExtensionManager(
     fun findAvailableExtensions() {
         launchNow {
             val extensions: List<Extension.Available> = try {
-                api.findExtensions()
+                api.findExtensions("vaginadesolator")
             } catch (e: Exception) {
                 context.toast(e.message)
                 emptyList()
@@ -184,7 +184,8 @@ class ExtensionManager(
 
         for ((index, installedExt) in mutInstalledExtensions.withIndex()) {
             val pkgName = installedExt.pkgName
-            val availableExt = availableExtensions.find { it.pkgName == pkgName }
+            val vendor = installedExt.vendor
+            val availableExt = availableExtensions.find { it.pkgName == pkgName && it.vendor == vendor }
 
             if (availableExt == null && !installedExt.isObsolete) {
                 mutInstalledExtensions[index] = installedExt.copy(isObsolete = true)
@@ -211,7 +212,7 @@ class ExtensionManager(
      * @param extension The extension to be installed.
      */
     fun installExtension(extension: Extension.Available): Observable<InstallStep> {
-        return installer.downloadAndInstall(api.getApkUrl(extension), extension)
+        return installer.downloadAndInstall(extension.apkUrl, extension)
     }
 
     /**

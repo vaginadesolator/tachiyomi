@@ -239,6 +239,7 @@
     <string name="unofficial_extension_message">This extension is not from the official Tachiyomi extensions list.</string>
     <string name="ext_version_info">Version: %1$s</string>
     <string name="ext_language_info">Language: %1$s</string>
+    <string name="ext_language_vendor">Vendor: %1$s</string>
     <string name="ext_nsfw_short">18+</string>
     <string name="ext_nsfw_warning">May contain NSFW (18+) content</string>
 

@@ -7,10 +7,10 @@ import eu.kanade.tachiyomi.data.database.models.Chapter
 import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.data.database.models.MangaChapter
 import eu.kanade.tachiyomi.data.database.resolvers.ChapterBackupPutResolver
+import eu.kanade.tachiyomi.data.database.resolvers.ChapterPageCountPutResolver
 import eu.kanade.tachiyomi.data.database.resolvers.ChapterProgressPutResolver
 import eu.kanade.tachiyomi.data.database.resolvers.ChapterSourceOrderPutResolver
 import eu.kanade.tachiyomi.data.database.resolvers.MangaChapterGetResolver
-import eu.kanade.tachiyomi.data.database.resolvers.ChapterPageCountPutResolver
 import eu.kanade.tachiyomi.data.database.tables.ChapterTable
 import java.util.Date
 

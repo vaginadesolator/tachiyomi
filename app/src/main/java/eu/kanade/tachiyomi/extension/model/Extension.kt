@@ -10,6 +10,7 @@ sealed class Extension {
     abstract val versionCode: Int
     abstract val lang: String?
     abstract val isNsfw: Boolean
+    abstract val vendor: String
 
     data class Installed(
         override val name: String,
@@ -18,6 +19,7 @@ sealed class Extension {
         override val versionCode: Int,
         override val lang: String,
         override val isNsfw: Boolean,
+        override val vendor: String,
         val sources: List<Source>,
         val hasUpdate: Boolean = false,
         val isObsolete: Boolean = false,
@@ -31,8 +33,10 @@ sealed class Extension {
         override val versionCode: Int,
         override val lang: String,
         override val isNsfw: Boolean,
+        override val vendor: String,
         val apkName: String,
-        val iconUrl: String
+        val iconUrl: String,
+        val apkUrl: String
     ) : Extension()
 
     data class Untrusted(
@@ -42,6 +46,11 @@ sealed class Extension {
         override val versionCode: Int,
         val signatureHash: String,
         override val lang: String? = null,
-        override val isNsfw: Boolean = false
+        override val isNsfw: Boolean = false,
+        override val vendor: String
     ) : Extension()
+
+    companion object {
+        fun buildExtName(name: String): String = name.substringAfter("Tachiyomi: ")
+    }
 }

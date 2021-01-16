@@ -22,18 +22,29 @@ internal class ExtensionGithubApi {
     private val networkService: NetworkHelper by injectLazy()
     private val preferences: PreferencesHelper by injectLazy()
 
-    suspend fun findExtensions(): List<Extension.Available> {
-        return withIOContext {
-            networkService.client
-                .newCall(GET("${REPO_URL_PREFIX}index.min.json"))
-                .await()
-                .parseAs<JsonArray>()
-                .let { parseResponse(it) }
+    private fun buildBaseUrl(githubUser: String?, githubRepository: String?): String {
+        return "$BASE_URL/${githubUser ?: DEFAULT_GITHUB_USER}/${githubRepository ?: DEFAULT_GITHUB_REPOSITORY}"
+    }
+
+    suspend fun findExtensions(vararg githubUsers: String, githubRepository: String? = null): List<Extension.Available> {
+        return findExtensions() + githubUsers.map { findExtensions(it, githubRepository) }.let {
+            if (it.isNotEmpty()) it.reduce { acc, list -> acc + list }
+            else emptyList()
         }
     }
 
-    suspend fun checkForUpdates(context: Context): List<Extension.Installed> {
-        val extensions = findExtensions()
+    private suspend fun findExtensions(githubUser: String? = null, githubRepository: String? = null): List<Extension.Available> {
+        return withIOContext {
+            networkService.client
+                .newCall(GET("${buildBaseUrl(githubUser, githubRepository)}/repo/index.min.json"))
+                .await()
+                .parseAs<JsonArray>()
+                .let { parseResponse(it, githubUser, githubRepository) }
+        }
+    }
+
+    suspend fun checkForUpdates(context: Context, githubUser: String? = null, githubRepository: String? = null): List<Extension.Installed> {
+        val extensions = findExtensions(githubUser, githubRepository)
 
         preferences.lastExtCheck().set(Date().time)
 
@@ -55,7 +66,7 @@ internal class ExtensionGithubApi {
         return extensionsWithUpdate
     }
 
-    private fun parseResponse(json: JsonArray): List<Extension.Available> {
+    private fun parseResponse(json: JsonArray, githubUser: String?, githubRepository: String?): List<Extension.Available> {
         return json
             .filter { element ->
                 val versionName = element.jsonObject["version"]!!.jsonPrimitive.content
@@ -63,25 +74,26 @@ internal class ExtensionGithubApi {
                 libVersion >= ExtensionLoader.LIB_VERSION_MIN && libVersion <= ExtensionLoader.LIB_VERSION_MAX
             }
             .map { element ->
-                val name = element.jsonObject["name"]!!.jsonPrimitive.content.substringAfter("Tachiyomi: ")
+                val name = Extension.buildExtName(element.jsonObject["name"]!!.jsonPrimitive.content)
                 val pkgName = element.jsonObject["pkg"]!!.jsonPrimitive.content
                 val apkName = element.jsonObject["apk"]!!.jsonPrimitive.content
                 val versionName = element.jsonObject["version"]!!.jsonPrimitive.content
                 val versionCode = element.jsonObject["code"]!!.jsonPrimitive.int
                 val lang = element.jsonObject["lang"]!!.jsonPrimitive.content
                 val nsfw = element.jsonObject["nsfw"]!!.jsonPrimitive.int == 1
-                val icon = "${REPO_URL_PREFIX}icon/${apkName.replace(".apk", ".png")}"
+                val vendor = element.jsonObject["vendor"]?.jsonPrimitive?.content ?: DEFAULT_GITHUB_USER
 
-                Extension.Available(name, pkgName, versionName, versionCode, lang, nsfw, apkName, icon)
+                with("${buildBaseUrl(githubUser, githubRepository)}/repo") {
+                    val iconUrl = "$this/icon/${apkName.replace(".apk", ".png")}"
+                    val apkUrl = "$this/apk/$apkName"
+                    Extension.Available(name, pkgName, versionName, versionCode, lang, nsfw, vendor, apkName, iconUrl, apkUrl)
+                }
             }
     }
 
-    fun getApkUrl(extension: Extension.Available): String {
-        return "${REPO_URL_PREFIX}apk/${extension.apkName}"
-    }
-
     companion object {
-        const val BASE_URL = "https://raw.githubusercontent.com/"
-        const val REPO_URL_PREFIX = "${BASE_URL}tachiyomiorg/tachiyomi-extensions/repo/"
+        const val BASE_URL = "https://raw.githubusercontent.com"
+        const val DEFAULT_GITHUB_USER = "tachiyomiorg"
+        const val DEFAULT_GITHUB_REPOSITORY = "tachiyomi-extensions"
     }
 }
