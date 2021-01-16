@@ -282,6 +282,8 @@ class ReaderPresenter(
             )
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { newChapters ->
+                onChapterLoad(newChapters.currChapter)
+
                 val oldChapters = viewerChaptersRelay.value
 
                 // Add new references first to avoid unnecessary recycling
@@ -290,6 +292,20 @@ class ReaderPresenter(
 
                 viewerChaptersRelay.call(newChapters)
             }
+    }
+
+    /**
+     * Called when a [chapter] has finished loading from [getLoadObservable]
+     */
+    private fun onChapterLoad(reader: ReaderChapter) {
+        with(reader.chapter) {
+            if (this.page_count == 0) {
+                this.page_count = reader.pages?.size ?: 0
+                if (this.page_count > 0) {
+                    db.updateChapterPageCount(this).executeAsBlocking()
+                }
+            }
+        }
     }
 
     /**

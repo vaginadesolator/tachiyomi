@@ -56,12 +56,21 @@ class ChapterHolder(
         if (chapter.date_upload > 0) {
             descriptions.add(adapter.dateFormat.format(Date(chapter.date_upload)))
         }
+
         if (!chapter.read && chapter.last_page_read > 0) {
-            val lastPageRead = SpannableString(itemView.context.getString(R.string.chapter_progress, chapter.last_page_read + 1)).apply {
+            val currentPage = chapter.last_page_read + 1
+            val text = if (chapter.page_count > 0) itemView.context.getString(R.string.chapter_progress_with_page_count, currentPage, chapter.page_count)
+            else itemView.context.getString(R.string.chapter_progress, currentPage)
+
+            val lastPageRead = SpannableString(text).apply {
                 setSpan(ForegroundColorSpan(adapter.readColor), 0, length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
+
             descriptions.add(lastPageRead)
+        } else if (chapter.page_count > 0) {
+            descriptions.add(itemView.context.getString(R.string.chapter_page_count, chapter.page_count))
         }
+
         if (!chapter.scanlator.isNullOrBlank()) {
             descriptions.add(chapter.scanlator!!)
         }
