@@ -2,6 +2,7 @@ package eu.kanade.tachiyomi.ui.browse.source
 
 import android.os.Bundle
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
+import eu.kanade.tachiyomi.extension.ExtensionManager
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.LocalSource
 import eu.kanade.tachiyomi.source.SourceManager
@@ -27,6 +28,7 @@ import java.util.TreeMap
  */
 class SourcePresenter(
     val sourceManager: SourceManager = Injekt.get(),
+    val extensionManager: ExtensionManager = Injekt.get(),
     private val preferences: PreferencesHelper = Injekt.get()
 ) : BasePresenter<SourceController>() {
 
@@ -66,12 +68,14 @@ class SourcePresenter(
         var sourceItems = byLang.flatMap {
             val langItem = LangItem(it.key)
             it.value.map { source ->
+                val extension = extensionManager.getExtensionForSource(source)
+
                 val isPinned = source.id.toString() in pinnedSourceIds
                 if (isPinned) {
-                    pinnedSources.add(SourceItem(source, LangItem(PINNED_KEY), isPinned))
+                    pinnedSources.add(SourceItem(source, extension, LangItem(PINNED_KEY), isPinned))
                 }
 
-                SourceItem(source, langItem, isPinned)
+                SourceItem(source, extension, langItem, isPinned)
             }
         }
 
@@ -98,8 +102,9 @@ class SourcePresenter(
 
     private fun updateLastUsedSource(sourceId: Long) {
         val source = (sourceManager.get(sourceId) as? CatalogueSource)?.let {
+            val extension = extensionManager.getExtensionForSource(it)
             val isPinned = it.id.toString() in preferences.pinnedSources().get()
-            SourceItem(it, null, isPinned)
+            SourceItem(it, extension, null, isPinned)
         }
         source?.let { view?.setLastUsedSource(it) }
     }

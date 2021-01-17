@@ -70,6 +70,8 @@ class ExtensionManager(
         return null
     }
 
+    fun getExtensionForSource(source: Source): Extension.Installed? = installedExtensions.firstOrNull { it.sources.contains(source) }
+
     /**
      * Relay used to notify the available extensions.
      */

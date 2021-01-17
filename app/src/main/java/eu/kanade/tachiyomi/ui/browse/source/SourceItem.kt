@@ -6,6 +6,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.AbstractSectionableItem
 import eu.davidea.flexibleadapter.items.IFlexible
 import eu.kanade.tachiyomi.R
+import eu.kanade.tachiyomi.extension.model.Extension
 import eu.kanade.tachiyomi.source.CatalogueSource
 
 /**
@@ -16,6 +17,7 @@ import eu.kanade.tachiyomi.source.CatalogueSource
  */
 data class SourceItem(
     val source: CatalogueSource,
+    val extension: Extension.Installed?,
     val header: LangItem? = null,
     val isPinned: Boolean = false
 ) :
