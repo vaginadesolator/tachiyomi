@@ -178,7 +178,7 @@ class ExtensionDetailsController(bundle: Bundle? = null) :
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.extension_details, menu)
 
-        menu.findItem(R.id.action_history).isVisible = presenter.extension?.isUnofficial == false
+        menu.findItem(R.id.action_history).isVisible = presenter.extension?.vendor != UNKNOWN_VENDOR
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -209,9 +209,6 @@ class ExtensionDetailsController(bundle: Bundle? = null) :
 
     private fun openCommitHistory() {
         val extension = presenter.extension!!
-
-        if (extension.vendor == UNKNOWN_VENDOR) return
-
         val pkgName = extension.pkgName.substringAfter("eu.kanade.tachiyomi.extension.")
         val url = "https://github.com/${extension.vendor}/tachiyomi-extensions/commits/master/src/${pkgName.replace(".", "/")}"
         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
