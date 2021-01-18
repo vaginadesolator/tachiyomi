@@ -44,10 +44,8 @@ import eu.kanade.tachiyomi.data.database.models.MangaCategory
 import eu.kanade.tachiyomi.data.database.models.MangaImpl
 import eu.kanade.tachiyomi.data.database.models.Track
 import eu.kanade.tachiyomi.data.database.models.TrackImpl
-import eu.kanade.tachiyomi.data.database.models.toMangaInfo
 import eu.kanade.tachiyomi.source.LocalSource
 import eu.kanade.tachiyomi.source.Source
-import eu.kanade.tachiyomi.source.model.toSManga
 import timber.log.Timber
 import kotlin.math.max
 
@@ -257,9 +255,9 @@ class LegacyBackupManager(context: Context, version: Int = CURRENT_VERSION) : Ab
      * @return Updated manga.
      */
     suspend fun fetchManga(source: Source, manga: Manga): Manga {
-        val networkManga = source.getMangaDetails(manga.toMangaInfo())
+        val networkManga = source.getMangaDetails(manga)
         return manga.also {
-            it.copyFrom(networkManga.toSManga())
+            it.copyFrom(networkManga)
             it.favorite = true
             it.initialized = true
             it.id = insertManga(manga)

@@ -1,7 +1,6 @@
 package eu.kanade.tachiyomi.data.database.models
 
 import eu.kanade.tachiyomi.source.model.SManga
-import tachiyomi.source.model.MangaInfo
 
 interface Manga : SManga {
 
@@ -98,17 +97,4 @@ interface Manga : SManga {
             this.source = source
         }
     }
-}
-
-fun Manga.toMangaInfo(): MangaInfo {
-    return MangaInfo(
-        artist = this.artist ?: "",
-        author = this.author ?: "",
-        cover = this.thumbnail_url ?: "",
-        description = this.description ?: "",
-        genres = this.getGenres() ?: emptyList(),
-        key = this.url,
-        status = this.status,
-        title = this.title
-    )
 }

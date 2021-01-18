@@ -10,15 +10,12 @@ import eu.kanade.tachiyomi.data.database.models.Category
 import eu.kanade.tachiyomi.data.database.models.Chapter
 import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.data.database.models.MangaCategory
-import eu.kanade.tachiyomi.data.database.models.toMangaInfo
 import eu.kanade.tachiyomi.data.download.DownloadManager
 import eu.kanade.tachiyomi.data.download.model.Download
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.data.track.TrackManager
 import eu.kanade.tachiyomi.source.LocalSource
 import eu.kanade.tachiyomi.source.Source
-import eu.kanade.tachiyomi.source.model.toSChapter
-import eu.kanade.tachiyomi.source.model.toSManga
 import eu.kanade.tachiyomi.ui.base.presenter.BasePresenter
 import eu.kanade.tachiyomi.ui.manga.chapter.ChapterItem
 import eu.kanade.tachiyomi.util.chapter.ChapterSettingsHelper
@@ -162,10 +159,9 @@ class MangaPresenter(
         if (fetchMangaJob?.isActive == true) return
         fetchMangaJob = presenterScope.launchIO {
             try {
-                val networkManga = source.getMangaDetails(manga.toMangaInfo())
-                val sManga = networkManga.toSManga()
-                manga.prepUpdateCover(coverCache, sManga, manualFetch)
-                manga.copyFrom(sManga)
+                val networkManga = source.getMangaDetails(manga)
+                manga.prepUpdateCover(coverCache, networkManga, manualFetch)
+                manga.copyFrom(networkManga)
                 manga.initialized = true
                 db.insertManga(manga).executeAsBlocking()
 
@@ -351,8 +347,7 @@ class MangaPresenter(
         if (fetchChaptersJob?.isActive == true) return
         fetchChaptersJob = presenterScope.launchIO {
             try {
-                val chapters = source.getChapterList(manga.toMangaInfo())
-                    .map { it.toSChapter() }
+                val chapters = source.getChapterList(manga)
 
                 val (newChapters, _) = syncChaptersWithSource(db, chapters, manga, source)
                 if (manualFetch) {

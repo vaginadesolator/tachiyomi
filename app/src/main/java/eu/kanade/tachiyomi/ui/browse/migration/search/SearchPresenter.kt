@@ -4,12 +4,10 @@ import android.os.Bundle
 import com.jakewharton.rxrelay.BehaviorRelay
 import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.data.database.models.MangaCategory
-import eu.kanade.tachiyomi.data.database.models.toMangaInfo
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.model.SManga
-import eu.kanade.tachiyomi.source.model.toSChapter
 import eu.kanade.tachiyomi.ui.browse.migration.MigrationFlags
 import eu.kanade.tachiyomi.ui.browse.source.globalsearch.GlobalSearchCardItem
 import eu.kanade.tachiyomi.ui.browse.source.globalsearch.GlobalSearchItem
@@ -56,9 +54,7 @@ class SearchPresenter(
         replacingMangaRelay.call(true)
 
         presenterScope.launchIO {
-            val chapters = source.getChapterList(manga.toMangaInfo())
-                .map { it.toSChapter() }
-
+            val chapters = source.getChapterList(manga)
             migrateMangaInternal(source, chapters, prevManga, manga, replace)
         }.invokeOnCompletion {
             presenterScope.launchUI { replacingMangaRelay.call(false) }

@@ -26,9 +26,7 @@ import eu.kanade.tachiyomi.data.database.models.History
 import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.data.database.models.MangaCategory
 import eu.kanade.tachiyomi.data.database.models.Track
-import eu.kanade.tachiyomi.data.database.models.toMangaInfo
 import eu.kanade.tachiyomi.source.Source
-import eu.kanade.tachiyomi.source.model.toSManga
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.protobuf.ProtoBuf
 import okio.buffer
@@ -191,9 +189,9 @@ class FullBackupManager(context: Context) : AbstractBackupManager(context) {
      */
     suspend fun restoreMangaFetch(source: Source?, manga: Manga, online: Boolean): Manga {
         return if (online && source != null) {
-            val networkManga = source.getMangaDetails(manga.toMangaInfo())
+            val networkManga = source.getMangaDetails(manga)
             manga.also {
-                it.copyFrom(networkManga.toSManga())
+                it.copyFrom(networkManga)
                 it.favorite = manga.favorite
                 it.initialized = true
                 it.id = insertManga(manga)
