@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - master
-    tags:
-      - v*
   pull_request:
 
 jobs:
@@ -54,15 +52,7 @@ jobs:
 
       # Sign APK and create release for tags
 
-      - name: Get tag name
-        if: startsWith(github.ref, 'refs/tags/') && github.repository == 'tachiyomiorg/tachiyomi'
-        id: get_tag_name
-        run: |
-          set -x
-          echo "VERSION_TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
-
       - name: Sign APK
-        if: startsWith(github.ref, 'refs/tags/') && github.repository == 'tachiyomiorg/tachiyomi'
         uses: r0adkll/sign-android-release@v1
         with:
           releaseDirectory: app/build/outputs/apk/standard/release
@@ -71,25 +61,41 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
 
+      - name: Set env variables
+        run: |
+          set -x
+          echo "COMMIT_COUNT=$(git rev-list --count HEAD)" >> $GITHUB_ENV
+          echo "CURRENT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
       - name: Create release
-        if: startsWith(github.ref, 'refs/tags/') && github.repository == 'tachiyomiorg/tachiyomi'
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.VERSION_TAG }}
-          release_name: Tachiyomi ${{ env.VERSION_TAG }}
-          draft: true
+          tag_name: r${{ env.COMMIT_COUNT }}
+          release_name: Tachiyomi Vaginadesolator ${{ env.COMMIT_COUNT }}
+          body: >
+            r${{ env.COMMIT_COUNT }}
+
+            Latest commit: https://github.com/vaginadesolator/tachiyomi/commit/${{ env.CURRENT_SHA }}
+          draft: false
           prerelease: false
 
       - name: Upload APK to release
-        if: startsWith(github.ref, 'refs/tags/') && github.repository == 'tachiyomiorg/tachiyomi'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ env.SIGNED_RELEASE_FILE }}
-          asset_name: tachiyomi-${{ env.VERSION_TAG }}.apk
+          asset_name: tachiyomi-vaginadesolator-r${{ env.COMMIT_COUNT }}.apk
           asset_content_type: application/vnd.android.package-archive
+
+      - name: Prune old releases
+        uses: dev-drprasad/delete-older-releases@v0.2.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          keep_latest: 10
+          delete_tags: true
