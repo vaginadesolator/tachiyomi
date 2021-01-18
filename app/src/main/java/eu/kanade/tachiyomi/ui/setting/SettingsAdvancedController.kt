@@ -46,7 +46,8 @@ class SettingsAdvancedController : SettingsController() {
             key = "acra.enable"
             titleRes = R.string.pref_enable_acra
             summaryRes = R.string.pref_acra_summary
-            defaultValue = true
+            defaultValue = false
+            isEnabled = false
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
