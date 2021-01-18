@@ -45,11 +45,7 @@ class AboutController : SettingsController() {
         preference {
             key = "pref_about_version"
             titleRes = R.string.version
-            summary = if (BuildConfig.DEBUG) {
-                "Preview r${BuildConfig.COMMIT_COUNT} (${BuildConfig.COMMIT_SHA})"
-            } else {
-                "Stable ${BuildConfig.VERSION_NAME}"
-            }
+            summary = "Release r${BuildConfig.COMMIT_COUNT} (${BuildConfig.COMMIT_SHA})"
 
             onClick { copyDebugInfo() }
         }
@@ -71,25 +67,9 @@ class AboutController : SettingsController() {
             titleRes = R.string.whats_new
 
             onClick {
-                val url = if (BuildConfig.DEBUG) {
-                    "https://github.com/tachiyomiorg/tachiyomi/commits/master"
-                } else {
-                    "https://github.com/tachiyomiorg/tachiyomi/releases/tag/v${BuildConfig.VERSION_NAME}"
-                }
-
+                val url = "https://github.com/vaginadesolator/tachiyomi/commits/master"
                 val intent = Intent(Intent.ACTION_VIEW, url.toUri())
                 startActivity(intent)
-            }
-        }
-        if (BuildConfig.DEBUG) {
-            preference {
-                key = "pref_about_notices"
-                titleRes = R.string.notices
-
-                onClick {
-                    val intent = Intent(Intent.ACTION_VIEW, "https://github.com/tachiyomiorg/tachiyomi/blob/master/PREVIEW_RELEASE_NOTES.md".toUri())
-                    startActivity(intent)
-                }
             }
         }
 
@@ -117,7 +97,7 @@ class AboutController : SettingsController() {
             preference {
                 key = "pref_about_github"
                 title = "GitHub"
-                val url = "https://github.com/tachiyomiorg/tachiyomi"
+                val url = "https://github.com/vaginadesolator/tachiyomi"
                 summary = url
                 onClick {
                     val intent = Intent(Intent.ACTION_VIEW, url.toUri())
@@ -127,7 +107,7 @@ class AboutController : SettingsController() {
             preference {
                 key = "pref_about_label_extensions"
                 titleRes = R.string.label_extensions
-                val url = "https://github.com/tachiyomiorg/tachiyomi-extensions"
+                val url = "https://github.com/vaginadesolator/tachiyomi-extensions"
                 summary = url
                 onClick {
                     val intent = Intent(Intent.ACTION_VIEW, url.toUri())
@@ -209,7 +189,7 @@ class AboutController : SettingsController() {
     private fun copyDebugInfo() {
         val deviceInfo =
             """
-            App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.FLAVOR}, ${BuildConfig.COMMIT_SHA}, ${BuildConfig.VERSION_CODE})
+            App version: r${BuildConfig.COMMIT_COUNT} (${BuildConfig.FLAVOR}, ${BuildConfig.COMMIT_SHA}, ${BuildConfig.VERSION_CODE})
             Android version: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})
             Android build ID: ${Build.DISPLAY}
             Device brand: ${Build.BRAND}

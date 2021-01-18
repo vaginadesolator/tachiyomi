@@ -13,13 +13,7 @@ class GithubUpdateChecker {
 
     private val networkService: NetworkHelper by injectLazy()
 
-    private val repo: String by lazy {
-        if (BuildConfig.DEBUG) {
-            "tachiyomiorg/tachiyomi-preview"
-        } else {
-            "tachiyomiorg/tachiyomi"
-        }
-    }
+    private val repo: String = "vaginadesolator/tachiyomi"
 
     suspend fun checkForUpdate(): UpdateResult {
         return withIOContext {
@@ -41,15 +35,6 @@ class GithubUpdateChecker {
     private fun isNewVersion(versionTag: String): Boolean {
         // Removes prefixes like "r" or "v"
         val newVersion = versionTag.replace("[^\\d.]".toRegex(), "")
-
-        return if (BuildConfig.DEBUG) {
-            // Preview builds: based on releases in "tachiyomiorg/tachiyomi-preview" repo
-            // tagged as something like "r1234"
-            newVersion.toInt() > BuildConfig.COMMIT_COUNT.toInt()
-        } else {
-            // Release builds: based on releases in "tachiyomiorg/tachiyomi" repo
-            // tagged as something like "v0.1.2"
-            newVersion != BuildConfig.VERSION_NAME
-        }
+        return newVersion.toInt() > BuildConfig.COMMIT_COUNT.toInt()
     }
 }
