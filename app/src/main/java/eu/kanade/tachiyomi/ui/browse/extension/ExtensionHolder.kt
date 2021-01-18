@@ -38,7 +38,7 @@ class ExtensionHolder(view: View, val adapter: ExtensionAdapter) :
         binding.warning.text = when {
             extension is Extension.Untrusted -> itemView.context.getString(R.string.ext_untrusted)
             extension is Extension.Installed && extension.isObsolete -> itemView.context.getString(R.string.ext_obsolete)
-            extension is Extension.Installed && extension.isUnofficial && extension.vendor == ExtensionLoader.UNOFFICIAL_VENDOR -> itemView.context.getString(R.string.ext_unofficial)
+            extension is Extension.Installed && extension.isUnofficial && extension.vendor == ExtensionLoader.UNKNOWN_VENDOR -> itemView.context.getString(R.string.ext_unofficial)
             extension.isNsfw && shouldLabelNsfw -> itemView.context.getString(R.string.ext_nsfw_short)
             else -> ""
         }.toUpperCase()

@@ -30,6 +30,7 @@ import eu.kanade.tachiyomi.data.preference.minusAssign
 import eu.kanade.tachiyomi.data.preference.plusAssign
 import eu.kanade.tachiyomi.databinding.ExtensionDetailControllerBinding
 import eu.kanade.tachiyomi.extension.model.Extension
+import eu.kanade.tachiyomi.extension.util.ExtensionLoader.UNKNOWN_VENDOR
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.ConfigurableSource
 import eu.kanade.tachiyomi.source.Source
@@ -207,8 +208,12 @@ class ExtensionDetailsController(bundle: Bundle? = null) :
     }
 
     private fun openCommitHistory() {
-        val pkgName = presenter.extension!!.pkgName.substringAfter("eu.kanade.tachiyomi.extension.")
-        val url = "https://github.com/tachiyomiorg/tachiyomi-extensions/commits/master/src/${pkgName.replace(".", "/")}"
+        val extension = presenter.extension!!
+
+        if (extension.vendor == UNKNOWN_VENDOR) return
+
+        val pkgName = extension.pkgName.substringAfter("eu.kanade.tachiyomi.extension.")
+        val url = "https://github.com/${extension.vendor}/tachiyomi-extensions/commits/master/src/${pkgName.replace(".", "/")}"
         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
         startActivity(intent)
     }

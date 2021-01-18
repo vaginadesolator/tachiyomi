@@ -42,7 +42,7 @@ internal object ExtensionLoader {
     // inorichi's key
     private const val officialSignature = "7ce04da7773d41b489f4693a366c36bcd0a11fc39b547168553c285bd7348e23"
 
-    const val UNOFFICIAL_VENDOR = "unknown"
+    const val UNKNOWN_VENDOR = "unknown"
 
     /**
      * List of the trusted signatures.
@@ -107,7 +107,7 @@ internal object ExtensionLoader {
         val extName = Extension.buildExtName(pkgManager.getApplicationLabel(appInfo).toString())
         val signatureHash = getSignatureHash(pkgInfo) ?: return LoadResult.Error("Package $pkgName isn't signed")
         val isOfficial = signatureHash == officialSignature
-        val vendor = appInfo.metaData.getString(METADATA_VENDOR, if (isOfficial) ExtensionGithubApi.DEFAULT_GITHUB_USER else UNOFFICIAL_VENDOR)
+        val vendor = appInfo.metaData.getString(METADATA_VENDOR, if (isOfficial) ExtensionGithubApi.DEFAULT_GITHUB_USER else UNKNOWN_VENDOR)
 
         val versionName = pkgInfo.versionName
         val versionCode = pkgInfo.versionCode
