@@ -147,18 +147,24 @@ class DownloadController :
                 presenter.clearQueue()
             }
             R.id.newest, R.id.oldest -> {
-                val adapter = adapter ?: return false
-                val items = adapter.currentItems.sortedBy { it.download.chapter.date_upload }
-                    .toMutableList()
-                if (item.itemId == R.id.newest) {
-                    items.reverse()
-                }
-                adapter.updateDataSet(items)
-                val downloads = items.mapNotNull { it.download }
-                presenter.reorder(downloads)
+                reorderQueue({ it.download.chapter.date_upload }, item.itemId == R.id.newest)
+            }
+            R.id.asc, R.id.desc -> {
+                reorderQueue({ it.download.chapter.chapter_number }, item.itemId == R.id.desc)
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun <R : Comparable<R>> reorderQueue(selector: (DownloadItem) -> R, reverse: Boolean = false) {
+        val adapter = adapter ?: return
+        val items = adapter.currentItems.sortedBy(selector).toMutableList()
+        if (reverse) {
+            items.reverse()
+        }
+        adapter.updateDataSet(items)
+        val downloads = items.mapNotNull { it.download }
+        presenter.reorder(downloads)
     }
 
     /**

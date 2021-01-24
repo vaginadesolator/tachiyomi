@@ -67,7 +67,7 @@ class AboutController : SettingsController() {
             titleRes = R.string.whats_new
 
             onClick {
-                val url = "https://github.com/vaginadesolator/tachiyomi/commits/master"
+                val url = "https://github.com/vaginadesolator/tachiyomi/releases/tag/r${BuildConfig.COMMIT_COUNT}"
                 val intent = Intent(Intent.ACTION_VIEW, url.toUri())
                 startActivity(intent)
             }
