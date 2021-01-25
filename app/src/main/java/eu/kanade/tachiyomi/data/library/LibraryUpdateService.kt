@@ -29,13 +29,18 @@ import eu.kanade.tachiyomi.util.prepUpdateCover
 import eu.kanade.tachiyomi.util.shouldDownloadNewChapters
 import eu.kanade.tachiyomi.util.storage.getUriCompat
 import eu.kanade.tachiyomi.util.system.acquireWakeLock
+import eu.kanade.tachiyomi.util.system.createFileInCacheDir
 import eu.kanade.tachiyomi.util.system.isServiceRunning
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import timber.log.Timber
 import uy.kohesive.injekt.Injekt
@@ -62,7 +67,7 @@ class LibraryUpdateService(
 
     private lateinit var wakeLock: PowerManager.WakeLock
     private lateinit var notifier: LibraryUpdateNotifier
-    private lateinit var scope: CoroutineScope
+    private lateinit var ioScope: CoroutineScope
 
     private var updateJob: Job? = null
 
@@ -139,7 +144,7 @@ class LibraryUpdateService(
     override fun onCreate() {
         super.onCreate()
 
-        scope = MainScope()
+        ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         notifier = LibraryUpdateNotifier(this)
         wakeLock = acquireWakeLock(javaClass.name)
 
@@ -151,7 +156,7 @@ class LibraryUpdateService(
      * lock.
      */
     override fun onDestroy() {
-        scope?.cancel()
+        ioScope?.cancel()
         updateJob?.cancel()
         if (wakeLock.isHeld) {
             wakeLock.release()
@@ -187,7 +192,7 @@ class LibraryUpdateService(
         val mangaList = getMangaToUpdate(intent, target)
             .sortedWith(rankingScheme[selectedScheme])
 
-        updateJob = scope.launchIO {
+        updateJob = ioScope.launch {
             try {
                 when (target) {
                     Target.CHAPTERS -> updateChapterList(mangaList)
@@ -244,17 +249,17 @@ class LibraryUpdateService(
      * @return an observable delivering the progress of each update.
      */
     suspend fun updateChapterList(mangaToUpdate: List<LibraryManga>) {
-        // Initialize the variables holding the progress of the updates.
         val progressCount = AtomicInteger(0)
-        // List containing new updates
         val newUpdates = mutableListOf<Pair<LibraryManga, Array<Chapter>>>()
-        // List containing failed updates
         val failedUpdates = mutableListOf<Pair<Manga, String?>>()
-        // Boolean to determine if DownloadManager has downloads
         var hasDownloads = false
 
         mangaToUpdate
             .map { manga ->
+                if (updateJob?.isActive != true) {
+                    throw CancellationException()
+                }
+
                 // Notify manga that will update.
                 notifier.showProgressNotification(manga, progressCount.andIncrement, mangaToUpdate.size)
 
@@ -326,16 +331,18 @@ class LibraryUpdateService(
 
         // Update manga details metadata in the background
         if (preferences.autoUpdateMetadata()) {
-            val networkManga = source.getMangaDetails(manga)
-            // Avoid "losing" existing cover
-            if (!networkManga.thumbnail_url.isNullOrEmpty()) {
-                manga.prepUpdateCover(coverCache, networkManga, false)
-            } else {
-                networkManga.thumbnail_url = manga.thumbnail_url
-            }
+            GlobalScope.launchIO {
+                val networkManga = source.getMangaDetails(manga)
+                // Avoid "losing" existing cover
+                if (!networkManga.thumbnail_url.isNullOrEmpty()) {
+                    manga.prepUpdateCover(coverCache, networkManga, false)
+                } else {
+                    networkManga.thumbnail_url = manga.thumbnail_url
+                }
 
-            manga.copyFrom(networkManga)
-            db.insertManga(manga).executeAsBlocking()
+                manga.copyFrom(networkManga)
+                db.insertManga(manga).executeAsBlocking()
+            }
         }
 
         val chapters = source.getChapterList(manga)
@@ -347,6 +354,10 @@ class LibraryUpdateService(
         var progressCount = 0
 
         mangaToUpdate.forEach { manga ->
+            if (updateJob?.isActive != true) {
+                throw CancellationException()
+            }
+
             notifier.showProgressNotification(manga, progressCount++, mangaToUpdate.size)
 
             sourceManager.get(manga.source)?.let { source ->
@@ -376,6 +387,10 @@ class LibraryUpdateService(
         val loggedServices = trackManager.services.filter { it.isLogged }
 
         mangaToUpdate.forEach { manga ->
+            if (updateJob?.isActive != true) {
+                throw CancellationException()
+            }
+
             // Notify manga that will update.
             notifier.showProgressNotification(manga, progressCount++, mangaToUpdate.size)
 
@@ -409,15 +424,14 @@ class LibraryUpdateService(
     private fun writeErrorFile(errors: List<Pair<Manga, String?>>): File {
         try {
             if (errors.isNotEmpty()) {
-                val destFile = File(externalCacheDir, "tachiyomi_update_errors.txt")
-
-                destFile.bufferedWriter().use { out ->
+                val file = createFileInCacheDir("tachiyomi_update_errors.txt")
+                file.bufferedWriter().use { out ->
                     errors.forEach { (manga, error) ->
                         val source = sourceManager.getOrStub(manga.source)
                         out.write("${manga.title} ($source): $error\n")
                     }
                 }
-                return destFile
+                return file
             }
         } catch (e: Exception) {
             // Empty

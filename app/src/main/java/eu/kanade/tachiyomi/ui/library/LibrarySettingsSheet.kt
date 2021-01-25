@@ -8,14 +8,17 @@ import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.preference.PreferenceValues.DisplayMode
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.data.track.TrackManager
+import eu.kanade.tachiyomi.data.track.TrackService
 import eu.kanade.tachiyomi.widget.ExtendedNavigationView
 import eu.kanade.tachiyomi.widget.ExtendedNavigationView.Item.TriStateGroup.State
 import eu.kanade.tachiyomi.widget.TabbedBottomSheetDialog
+import uy.kohesive.injekt.Injekt
+import uy.kohesive.injekt.api.get
 import uy.kohesive.injekt.injectLazy
-import uy.kohesive.injekt.injectValue
 
 class LibrarySettingsSheet(
     router: Router,
+    private val trackManager: TrackManager = Injekt.get(),
     onGroupClickListener: (ExtendedNavigationView.Group) -> Unit
 ) : TabbedBottomSheetDialog(router) {
 
@@ -54,8 +57,6 @@ class LibrarySettingsSheet(
 
         private val filterGroup = FilterGroup()
 
-        private val trackManager: TrackManager by injectValue()
-
         init {
             setGroups(listOf(filterGroup))
         }
@@ -64,7 +65,7 @@ class LibrarySettingsSheet(
          * Returns true if there's at least one filter from [FilterGroup] active.
          */
         fun hasActiveFilters(): Boolean {
-            return filterGroup.items.any { it.state != State.IGNORE.value }
+            return filterGroup.items.filterIsInstance<Item.TriStateGroup>().any { it.state != State.IGNORE.value }
         }
 
         inner class FilterGroup : Group {
@@ -72,11 +73,29 @@ class LibrarySettingsSheet(
             private val downloaded = Item.TriStateGroup(R.string.action_filter_downloaded, this)
             private val unread = Item.TriStateGroup(R.string.action_filter_unread, this)
             private val completed = Item.TriStateGroup(R.string.completed, this)
-            private val tracking = Item.TriStateGroup(R.string.action_filter_tracked, this)
+            private val trackFilters: Map<Int, Item.TriStateGroup>
 
             override val header = null
-            override val items = listOf(downloaded, unread, completed, tracking)
+            override val items: List<Item>
             override val footer = null
+
+            init {
+                trackManager.services.filter { service -> service.isLogged }
+                    .also { services ->
+                        val size = services.size
+                        trackFilters = services.associate { service ->
+                            Pair(service.id, Item.TriStateGroup(getServiceResId(service, size), this))
+                        }
+                        val list: MutableList<Item> = mutableListOf(downloaded, unread, completed)
+                        if (size > 1) list.add(Item.Header(R.string.action_filter_tracked))
+                        list.addAll(trackFilters.values)
+                        items = list
+                    }
+            }
+
+            private fun getServiceResId(service: TrackService, size: Int): Int {
+                return if (size > 1) service.nameRes() else R.string.action_filter_tracked
+            }
 
             override fun initModels() {
                 if (preferences.downloadedOnly().get()) {
@@ -88,12 +107,8 @@ class LibrarySettingsSheet(
                 unread.state = preferences.filterUnread().get()
                 completed.state = preferences.filterCompleted().get()
 
-                if (!trackManager.hasLoggedServices()) {
-                    tracking.state = State.IGNORE.value
-                    tracking.isVisible = false
-                } else {
-                    tracking.state = preferences.filterTracking().get()
-                    tracking.isVisible = true
+                trackFilters.forEach { trackFilter ->
+                    trackFilter.value.state = preferences.filterTracking(trackFilter.key).get()
                 }
             }
 
@@ -110,7 +125,13 @@ class LibrarySettingsSheet(
                     downloaded -> preferences.filterDownloaded().set(newState)
                     unread -> preferences.filterUnread().set(newState)
                     completed -> preferences.filterCompleted().set(newState)
-                    tracking -> preferences.filterTracking().set(newState)
+                    else -> {
+                        trackFilters.forEach { trackFilter ->
+                            if (trackFilter.value == item) {
+                                preferences.filterTracking(trackFilter.key).set(newState)
+                            }
+                        }
+                    }
                 }
 
                 adapter.notifyItemChanged(item)

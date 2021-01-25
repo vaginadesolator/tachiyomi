@@ -2,6 +2,7 @@ package eu.kanade.tachiyomi.data.track.myanimelist
 
 import android.content.Context
 import android.graphics.Color
+import androidx.annotation.StringRes
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.database.models.Track
 import eu.kanade.tachiyomi.data.track.TrackService
@@ -30,8 +31,8 @@ class MyAnimeList(private val context: Context, id: Int) : TrackService(id) {
     private val interceptor by lazy { MyAnimeListInterceptor(this, getPassword()) }
     private val api by lazy { MyAnimeListApi(client, interceptor) }
 
-    override val name: String
-        get() = "MyAnimeList"
+    @StringRes
+    override fun nameRes() = R.string.tracker_myanimelist
 
     override val supportsReadingDates: Boolean = true
 
@@ -101,7 +102,7 @@ class MyAnimeList(private val context: Context, id: Int) : TrackService(id) {
     }
 
     override suspend fun refresh(track: Track): Track {
-        return api.getListItem(track)
+        return api.findListItem(track) ?: api.addItemToList(track)
     }
 
     override suspend fun login(username: String, password: String) = login(password)
