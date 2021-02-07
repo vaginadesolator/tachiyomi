@@ -30,8 +30,8 @@ android {
         minSdkVersion(AndroidConfig.minSdk)
         targetSdkVersion(AndroidConfig.targetSdk)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 54
-        versionName = "0.10.7"
+        versionCode = 55
+        versionName = "0.10.8"
 
         buildConfigField("String", "COMMIT_COUNT", "\"${getCommitCount()}\"")
         buildConfigField("String", "COMMIT_SHA", "\"${getGitSha()}\"")
@@ -122,7 +122,7 @@ dependencies {
     // AndroidX libraries
     implementation("androidx.annotation:annotation:1.2.0-beta01")
     implementation("androidx.appcompat:appcompat:1.3.0-beta01")
-    implementation("androidx.biometric:biometric-ktx:1.2.0-alpha01")
+    implementation("androidx.biometric:biometric-ktx:1.2.0-alpha02")
     implementation("androidx.browser:browser:1.3.0")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.0-alpha2")
@@ -139,12 +139,12 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
 
     // Job scheduling
-    implementation("androidx.work:work-runtime-ktx:2.5.0-rc01")
+    implementation("androidx.work:work-runtime-ktx:2.5.0")
 
     // UI library
-    implementation("com.google.android.material:material:1.3.0-rc01")
+    implementation("com.google.android.material:material:1.3.0")
 
-    "standardImplementation"("com.google.firebase:firebase-core:18.0.1")
+    "standardImplementation"("com.google.firebase:firebase-core:18.0.2")
 
     // ReactiveX
     implementation("io.reactivex:rxandroid:1.2.1")
@@ -157,7 +157,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:$okhttpVersion")
     implementation("com.squareup.okhttp3:logging-interceptor:$okhttpVersion")
     implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:$okhttpVersion")
-    implementation("com.squareup.okio:okio:2.9.0")
+    implementation("com.squareup.okio:okio:2.10.0")
 
     // TLS 1.3 support for Android < 10
     implementation("org.conscrypt:conscrypt-android:2.5.1")
@@ -203,6 +203,8 @@ dependencies {
     implementation("com.github.bumptech.glide:okhttp3-integration:$glideVersion")
     kapt("com.github.bumptech.glide:compiler:$glideVersion")
 
+    // implementation("com.github.tachiyomiorg:subsampling-scale-image-view:6caf219")
+    // TODO: switch to new decoder for stable releases
     implementation("com.github.tachiyomiorg:subsampling-scale-image-view:ca26317")
 
     // Logging
@@ -308,7 +310,6 @@ repositories {
     jcenter()
     mavenLocal()
 }
-
 
 // Git is needed in your system PATH for these commands to work.
 // If it's not installed, you can return a random value as a workaround

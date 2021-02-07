@@ -166,7 +166,6 @@
     <string name="all">Kaikki</string>
     <string name="pref_library_update_restriction">Kirjaston päivityksen rajoitukset</string>
     <string name="pref_library_update_restriction_summary">Päivitä vain kun vaatimukset täyttyvät</string>
-    <string name="wifi">Wi-Fi</string>
     <string name="charging">Latauksessa</string>
     <string name="pref_update_only_non_completed">Päivitä vain jatkuvat sarjat</string>
     <string name="pref_auto_update_manga_sync">Päivitä luvun edistyminen lukemisen jälkeen</string>
@@ -266,7 +265,7 @@
     <string name="pref_backup_slots">Varmuuskopioiden enimmäismäärä</string>
     <string name="backup_created">Varmuuskopio luotu</string>
     <string name="restore_completed">Palautus valmis</string>
-    <string name="backup_restore_content">Palautus käyttää lähdettä noutaakseen tietoja, tämä voi aiheuttaa kustannuksia. 
+    <string name="backup_restore_content">Palautus käyttää lähdettä noutaakseen tietoja, tämä voi aiheuttaa kustannuksia.
 \n
 \nVarmista myös että sinulla on kaikki tarvittavat laajennukset ja olet kirjautunut lähteisiin ja seuranta palveluihin ennen palauttamista.</string>
     <string name="backup_choice">Mitä haluat varmuuskopioida\?</string>
@@ -567,7 +566,6 @@
     </plurals>
     <string name="action_open_in_settings">Avaa Asetuksissa</string>
     <string name="requires_app_restart">Edellyttää sovelluksen käynnisstämisen uudelleen</string>
-    <string name="pref_dns_over_https" translatable="false">DNS HTTPS:n kautta (Cloudflare)</string>
     <string name="label_network">Verkko</string>
     <string name="pref_jump_to_chapters">Siirry lukuihin avatessa</string>
     <string name="tapping_inverted_both">Molemmat</string>
@@ -613,7 +611,6 @@
     <string name="also_set_chapter_settings_for_library">Koskee myös kaikkia kirjastoni mangoja</string>
     <string name="confirm_set_chapter_settings">Haluatko varmasti tallentaa nämä asetukset oletuksena\?</string>
     <string name="chapter_settings">Luvun asetukset</string>
-    <string name="action_web_view">WebView</string>
     <string name="share_page_info">%1$s: %2$s, sivu %3$d</string>
     <string name="action_search_settings">Hakuasetukset</string>
     <string name="downloaded_chapters">Ladatut luvut</string>
@@ -645,7 +642,19 @@
     <string name="myanimelist_creds_missing">MAL-kirjautumistietoja ei löytynyt</string>
     <string name="pref_viewer_nav">Navigointiasettelu</string>
     <string name="edge_nav">Reuna</string>
-    <string name="kindlish_nav">Kindle-ish</string>
+    <string name="kindlish_nav">Kindle tyylinen</string>
     <string name="l_nav">L-muotoinen</string>
     <string name="default_nav">Oletus</string>
+    <string name="pref_dump_crash_logs">Poista kaatumislokit</string>
+    <string name="channel_crash_logs">Kaatumislokit</string>
+    <string name="track_finished_reading_date">Lopetuspäivämäärä</string>
+    <string name="track_started_reading_date">Aloituspäivämäärä</string>
+    <string name="crash_log_saved">Kaatumislokit tallennettu</string>
+    <string name="pref_dump_crash_logs_summary">Tallentaa virhelokit tiedostoon jaettavaksi kehittäjien kanssa</string>
+    <string name="network_unmetered">Mittaamaton verkko</string>
+    <string name="action_desc">Laskeva</string>
+    <string name="action_asc">Nouseva</string>
+    <string name="action_order_by_chapter_number">Luvunumeron mukaan</string>
+    <string name="action_order_by_upload_date">Lisäyspäivämäärän mukaan</string>
+    <string name="action_filter_tracked">Seuratut</string>
 </resources>

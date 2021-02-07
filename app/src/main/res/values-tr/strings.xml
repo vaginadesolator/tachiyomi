@@ -103,7 +103,6 @@
     <string name="all">Tümü</string>
     <string name="pref_library_update_restriction">Kitaplık güncelleme kısıtlamaları</string>
     <string name="pref_library_update_restriction_summary">Yalnızca koşullar sağlandığında güncelle</string>
-    <string name="wifi">Wi-Fi</string>
     <string name="charging">Şarj oluyor</string>
     <string name="pref_update_only_non_completed">Yalnızca devam eden mangaları güncelleme</string>
     <string name="pref_auto_update_manga_sync">Okuyunca bölüm ilerlemesini güncelle</string>
@@ -124,10 +123,10 @@
     <string name="ext_uninstall">Kaldır</string>
     <string name="ext_available">Kullanılabilir</string>
     <string name="untrusted_extension">Güvenilmeyen uzantı</string>
-    <string name="untrusted_extension_message">Bu uzantı güvenilmeyen bir sertifika ile imzalanmış ve etkinleştirilmedi. 
-\n 
-\nKötü niyetli bir uzantı, Tachiyomi\'de saklanan her giriş kimlik bilgisini okuyabilir veya rastgele kod yürütebilir. 
-\n 
+    <string name="untrusted_extension_message">Bu uzantı güvenilmeyen bir sertifika ile imzalanmış ve etkinleştirilmedi.
+\n
+\nKötü niyetli bir uzantı, Tachiyomi\'de saklanan her giriş kimlik bilgisini okuyabilir veya rastgele kod yürütebilir.
+\n
 \nBu sertifikaya güvenerek bu riskleri kabul etmiş oluyorsunuz.</string>
     <string name="ext_version_info">Sürüm: %1$s</string>
     <string name="ext_language_info">Dil: %1$s</string>
@@ -204,8 +203,8 @@
     <string name="pref_backup_slots">Maksimum yedek</string>
     <string name="backup_created">Yedek oluşturuldu</string>
     <string name="restore_completed">Geri yükleme tamamlandı</string>
-    <string name="backup_restore_content">Geri yükleme veriyi almak için kaynakları kullanır, taşıyıcı ücreti uygulanabilir. 
-\n 
+    <string name="backup_restore_content">Geri yükleme veriyi almak için kaynakları kullanır, taşıyıcı ücreti uygulanabilir.
+\n
 \nGeri yüklemeden önce, giriş gerektiren kaynaklara ve izleme hizmetlerine giriş yaptığınızdan, ve gerekli tüm uzantıları kurduğunuzdan emin olun.</string>
     <string name="backup_choice">Neyi yedeklemek istiyorsunuz?</string>
     <string name="restoring_backup">Yedek geri yükleniyor</string>
@@ -567,7 +566,6 @@
     </plurals>
     <string name="action_open_in_settings">Ayarlarda aç</string>
     <string name="requires_app_restart">Etkili olması için uygulamanın yeniden başlatılmasını gerektirir</string>
-    <string name="pref_dns_over_https" translatable="false">HTTPS ile DNS (Cloudflare)</string>
     <string name="label_network">Ağ</string>
     <string name="pref_jump_to_chapters">Açınca bölümlere git</string>
     <string name="tapping_inverted_none">Yok</string>
@@ -613,7 +611,6 @@
     <string name="also_set_chapter_settings_for_library">Kitaplığımdaki tüm mangalara da uygula</string>
     <string name="confirm_set_chapter_settings">Bu ayarları öntanımlı olarak kaydetmek istediğinizden emin misiniz\?</string>
     <string name="chapter_settings">Bölüm ayarları</string>
-    <string name="action_web_view">WebView</string>
     <string name="share_page_info">%1$s: %2$s, sayfa %3$d</string>
     <string name="action_search_settings">Arama ayarları</string>
     <string name="downloaded_chapters">İndirilen bölümler</string>
@@ -648,4 +645,17 @@
     <string name="kindlish_nav">Kindle gibi</string>
     <string name="l_nav">L şeklinde</string>
     <string name="default_nav">Öntanımlı</string>
+    <string name="channel_crash_logs">Çökme günlükleri</string>
+    <string name="track_finished_reading_date">Okumayı bitirme tarihi</string>
+    <string name="track_started_reading_date">Okumaya başlama tarihi</string>
+    <string name="crash_log_saved">Çökme günlükleri kaydedildi</string>
+    <string name="pref_dump_crash_logs_summary">Geliştiricilerle paylaşmak için hata günlüklerini bir dosyaya kaydeder</string>
+    <string name="pref_dump_crash_logs">Çökme günlüklerini kaydet</string>
+    <string name="network_unmetered">Veri sınırı olmayan ağ</string>
+    <string name="action_desc">Azalan</string>
+    <string name="action_asc">Artan</string>
+    <string name="action_order_by_chapter_number">Bölüm numarasına göre</string>
+    <string name="action_order_by_upload_date">Yükleme tarihine göre</string>
+    <string name="action_filter_tracked">İzleniyor</string>
+    <string name="action_display_show_number_of_items">Öge sayısını göster</string>
 </resources>

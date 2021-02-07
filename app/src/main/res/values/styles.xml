@@ -56,6 +56,19 @@
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">?attr/colorPrimary</item>
+        <item name="bottomSheetStyle">@style/Theme.BottomSheet.Style</item>
+    </style>
+
+    <style name="Theme.BottomSheet.Style" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/Theme.BottomSheet.Style.ShapeAppearance</item>
+    </style>
+
+    <style name="Theme.BottomSheet.Style.ShapeAppearance" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">8dp</item>
+        <item name="cornerSizeTopLeft">8dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
     </style>
 
 
@@ -142,7 +155,7 @@
         <item name="fabCustomSize">@dimen/fab_size</item>
         <item name="android:minWidth">@dimen/fab_size</item>
         <item name="android:layout_gravity">bottom|end</item>
-        <item name="android:layout_margin">@dimen/fab_margin</item>
+        <item name="android:layout_margin">16dp</item>
         <item name="android:scaleType">fitCenter</item>
         <item name="layout_anchorGravity">bottom|right|end</item>
         <item name="android:fontFamily">sans-serif-medium</item>

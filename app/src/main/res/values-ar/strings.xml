@@ -96,7 +96,6 @@
     <string name="all">الكل</string>
     <string name="pref_library_update_restriction">قيود تحديثات المكتبة</string>
     <string name="pref_library_update_restriction_summary">تحديث فقط عندما يتم استيفاء الشروط</string>
-    <string name="wifi">الواي فاى Wi-Fi</string>
     <string name="charging">جاري الشحن</string>
     <string name="pref_update_only_non_completed">تحديث المانجا المستمرة فقط</string>
     <string name="pref_auto_update_manga_sync">تحديث تقدّم الفصول بعد القراءة</string>
@@ -661,7 +660,6 @@
     <string name="also_set_chapter_settings_for_library">تطبيق أيضًا على جميع المانجا في المكتبة</string>
     <string name="confirm_set_chapter_settings">هل أنت متأكد أنك تريد حفظ هذه الإعدادات كافتراضي؟</string>
     <string name="chapter_settings">إعدادات الفصل</string>
-    <string name="action_web_view">عرض الويب</string>
     <string name="action_search_settings">إعدادات البحث</string>
     <string name="downloaded_chapters">الفصول المنزّلة</string>
     <string name="manga_from_library">مانغا من المكتبة</string>

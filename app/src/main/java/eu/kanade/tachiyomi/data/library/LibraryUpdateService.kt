@@ -24,17 +24,15 @@ import eu.kanade.tachiyomi.source.SourceManager
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.util.chapter.NoChaptersException
 import eu.kanade.tachiyomi.util.chapter.syncChaptersWithSource
-import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.prepUpdateCover
 import eu.kanade.tachiyomi.util.shouldDownloadNewChapters
 import eu.kanade.tachiyomi.util.storage.getUriCompat
 import eu.kanade.tachiyomi.util.system.acquireWakeLock
 import eu.kanade.tachiyomi.util.system.createFileInCacheDir
 import eu.kanade.tachiyomi.util.system.isServiceRunning
-import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
@@ -192,20 +190,18 @@ class LibraryUpdateService(
         val mangaList = getMangaToUpdate(intent, target)
             .sortedWith(rankingScheme[selectedScheme])
 
-        updateJob = ioScope.launch {
-            try {
-                when (target) {
-                    Target.CHAPTERS -> updateChapterList(mangaList)
-                    Target.COVERS -> updateCovers(mangaList)
-                    Target.TRACKING -> updateTrackings(mangaList)
-                }
-            } catch (e: Throwable) {
-                Timber.e(e)
-                stopSelf(startId)
-            } finally {
-                stopSelf(startId)
+        val handler = CoroutineExceptionHandler { _, exception ->
+            Timber.e(exception)
+            stopSelf(startId)
+        }
+        updateJob = ioScope.launch(handler) {
+            when (target) {
+                Target.CHAPTERS -> updateChapterList(mangaList)
+                Target.COVERS -> updateCovers(mangaList)
+                Target.TRACKING -> updateTrackings(mangaList)
             }
         }
+        updateJob?.invokeOnCompletion { stopSelf(startId) }
 
         return START_REDELIVER_INTENT
     }
@@ -257,7 +253,7 @@ class LibraryUpdateService(
         mangaToUpdate
             .map { manga ->
                 if (updateJob?.isActive != true) {
-                    throw CancellationException()
+                    return
                 }
 
                 // Notify manga that will update.
@@ -331,7 +327,10 @@ class LibraryUpdateService(
 
         // Update manga details metadata in the background
         if (preferences.autoUpdateMetadata()) {
-            GlobalScope.launchIO {
+            val handler = CoroutineExceptionHandler { _, exception ->
+                Timber.e(exception)
+            }
+            ioScope.launch(handler) {
                 val networkManga = source.getMangaDetails(manga)
                 // Avoid "losing" existing cover
                 if (!networkManga.thumbnail_url.isNullOrEmpty()) {
@@ -355,7 +354,7 @@ class LibraryUpdateService(
 
         mangaToUpdate.forEach { manga ->
             if (updateJob?.isActive != true) {
-                throw CancellationException()
+                return
             }
 
             notifier.showProgressNotification(manga, progressCount++, mangaToUpdate.size)
@@ -388,7 +387,7 @@ class LibraryUpdateService(
 
         mangaToUpdate.forEach { manga ->
             if (updateJob?.isActive != true) {
-                throw CancellationException()
+                return
             }
 
             // Notify manga that will update.

@@ -11,7 +11,7 @@ import eu.kanade.tachiyomi.data.track.TrackManager
 import eu.kanade.tachiyomi.data.track.TrackService
 import eu.kanade.tachiyomi.widget.ExtendedNavigationView
 import eu.kanade.tachiyomi.widget.ExtendedNavigationView.Item.TriStateGroup.State
-import eu.kanade.tachiyomi.widget.TabbedBottomSheetDialog
+import eu.kanade.tachiyomi.widget.sheet.TabbedBottomSheetDialog
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import uy.kohesive.injekt.injectLazy
@@ -295,20 +295,23 @@ class LibrarySettingsSheet(
 
         inner class TabsGroup : Group {
             private val showTabs = Item.CheckboxGroup(R.string.action_display_show_tabs, this)
+            private val showNumberOfItems = Item.CheckboxGroup(R.string.action_display_show_number_of_items, this)
 
             override val header = Item.Header(R.string.tabs_header)
-            override val items = listOf(showTabs)
+            override val items = listOf(showTabs, showNumberOfItems)
             override val footer = null
 
             override fun initModels() {
                 showTabs.checked = preferences.categoryTabs().get()
+                showNumberOfItems.checked = preferences.categoryNumberOfItems().get()
             }
 
             override fun onItemClicked(item: Item) {
                 item as Item.CheckboxGroup
                 item.checked = !item.checked
                 when (item) {
-                    showTabs -> preferences.categoryTabs().set((item.checked))
+                    showTabs -> preferences.categoryTabs().set(item.checked)
+                    showNumberOfItems -> preferences.categoryNumberOfItems().set(item.checked)
                 }
                 adapter.notifyItemChanged(item)
             }
